@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ClickUp vs AppSheet — Central de Solicitações de Melhoria</title>
+  <style>
+    :root{
+      --bg:#0f172a;           /* fundo escuro */
+      --panel:#101827;         /* painel */
+      --text:#f8fafc;          /* texto principal */
+      --muted:#cbd5e1;         /* texto secundário */
+      --brand:#EE4D2D;         /* Shopee Orange */
+      --brand-dark:#c43e24;    /* tom escuro */
+      --brand-soft:#ffe4dc;    /* tom claro */
+      --border:#253453;        /* bordas frias */
+      --ok:#10b981;            /* verde */
+      --no:#ef4444;            /* vermelho */
+      --radius:18px;
+      --shadow:0 10px 30px rgba(0,0,0,.35);
+    }
+
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{margin:0; font:16px/1.6 Inter, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, "Helvetica Neue", Arial; color:var(--text); background: radial-gradient(1200px 800px at 80% -10%, #1b2642 0%, #0a0f1f 60%, #070a14 100%);}    
+    .wrap{max-width:1150px; margin:0 auto; padding:44px 22px 90px}
+
+    /* Header */
+    header{display:flex; align-items:center; justify-content:space-between; gap:16px; flex-wrap:wrap; margin-bottom:18px}
+    .brand-left{display:flex; gap:14px; align-items:center}
+    .logo{height:46px; width:auto; border-radius:12px; padding:6px 8px; background:var(--brand-soft); border:1px solid #ffcfc3}
+    .title{margin:0; font-size: clamp(26px, 3.4vw, 40px); line-height:1.15}
+    .title .accent{background:linear-gradient(90deg,#fff,var(--brand),#ffb199 80%); -webkit-background-clip:text; background-clip:text; color:transparent}
+    .subtitle{margin:6px 0 0; color:var(--muted)}
+    .chip{display:inline-flex; align-items:center; gap:8px; padding:6px 10px; border-radius:999px; background:linear-gradient(90deg,var(--brand),#ff7f66); color:#230c07; font-weight:800}
+
+    /* Nav */
+    nav{position:sticky; top:0; z-index:40; backdrop-filter:blur(8px); border-bottom:1px solid var(--border); background:linear-gradient( to right, #0c1428cc, #0c1428bb )}
+    nav .tabs{display:flex; gap:10px; overflow:auto; padding:10px 16px}
+    nav a{color:var(--muted); text-decoration:none; padding:10px 14px; border-radius:12px; white-space:nowrap; border:1px solid #1f2937}
+    nav a:hover{color:#fff; border-color:#334155}
+
+    /* Sections & Cards */
+    section{margin:24px 0 32px; padding:24px; background: linear-gradient(180deg, #0b1224cc, #0b1224 60%); border:1px solid var(--border); border-radius:var(--radius); box-shadow:var(--shadow)}
+    h2{margin:0 0 12px; font-size: clamp(22px, 2.6vw, 32px)}
+    h3{margin:10px 0 8px; color:#ffd5cc}
+    p{margin:8px 0 14px}
+    .grid{display:grid; gap:16px}
+    .cols-2{grid-template-columns: repeat(2, minmax(0,1fr));}
+    .cols-3{grid-template-columns: repeat(3, minmax(0,1fr));}
+    @media (max-width: 960px){ .cols-3{grid-template-columns:1fr 1fr} }
+    @media (max-width: 720px){ .cols-2, .cols-3{grid-template-columns:1fr} }
+
+    .card{background:linear-gradient(180deg, #0b1224, #0a1022); border:1px solid #1f2a44; border-radius:16px; padding:18px; box-shadow: var(--shadow)}
+    .kpi{display:flex; align-items:center; gap:12px}
+    .kpi .icon{width:40px; height:40px; display:grid; place-items:center; border-radius:12px; background:linear-gradient(160deg,#ee4d2d33,#ee4d2d22)}
+    .muted{color:var(--muted)}
+    .list{display:grid; gap:10px; padding-left:20px}
+    .list li{margin:4px 0; overflow-wrap:anywhere}
+
+    /* Compare table — **colunas separadas** e legibilidade melhorada */
+    table.compare { width: 100%; border-collapse: separate; border-spacing: 0; margin-top: 10px; overflow:hidden; border-radius:14px; border:1px solid var(--border); }
+    table.compare thead th { position:sticky; top:0; background:linear-gradient(180deg, var(--brand), var(--brand-dark)); color:#fff; text-align:left; padding:14px; }
+    table.compare th, table.compare td { padding: 14px; text-align: left; vertical-align: top; }
+    table.compare tbody td{ background:#0f1730; border-top:1px solid #1e2a46; }
+    table.compare tbody tr:nth-child(odd) td { background:#0c1429; }
+    table.compare tbody td + td { border-left:1px solid var(--border); }
+    table.compare tfoot td { background:#0f1730; border-top:2px solid var(--brand-dark); font-weight:700 }
+    .x{color:#ff9a88; font-weight:800}
+    .check{color:#5bec9a; font-weight:800}
+
+    /* Timeline */
+    .timeline{position:relative; padding-left:26px}
+    .timeline::before{content:""; position:absolute; left:10px; top:0; bottom:0; width:2px; background:#243045}
+    .timeline-step{position:relative; margin:16px 0}
+    .timeline-step::before{content:""; position:absolute; left:-5px; top:6px; width:12px; height:12px; border-radius:999px; background:var(--brand); box-shadow:0 0 0 4px #0b1224}
+
+    /* Footer */
+    .footer{display:flex; gap:10px; flex-wrap:wrap; justify-content:space-between; align-items:center; margin-top:18px; color:#9fb6d1}
+    .cta{display:flex; gap:10px; flex-wrap:wrap}
+    .btn{background:linear-gradient(90deg,var(--brand),#ff7f66); color:#230c07; border:none; border-radius:999px; padding:10px 14px; font-weight:800; cursor:pointer}
+    .btn.secondary{background:transparent; color:#ffd5cc; border:1px solid #2b3957}
+
+    /* Galeria Shopito */
+    .gallery{display:grid; gap:14px; grid-template-columns:repeat(3,1fr)}
+    .gallery img{width:100%; height:220px; object-fit:cover; border-radius:14px; border:1px solid #2a3a5f; background:#081020}
+    @media (max-width:880px){.gallery{grid-template-columns:1fr 1fr}.gallery img{height:200px}}
+    @media (max-width:560px){.gallery{grid-template-columns:1fr}.gallery img{height:240px}}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="brand-left">
+        <img class="logo" alt="Shopee" src="https://upload.wikimedia.org/wikipedia/commons/4/4f/Shopee_logo.svg" />
+        <div>
+          <h1 class="title"><span class="accent">ClickUp × AppSheet</span> — Melhoria de Processos</h1>
+          <div class="subtitle">Melhorias no fluxo de solicitações</div>
+        </div>
+      </div>
+      <span class="chip">Time de Processos CS</span>
+    </header>
+
+    <nav>
+      <div class="tabs">
+        <a href="#iniciativa">Iniciativa</a>
+        <a href="#dor-clickup">Pain Points (ClickUp)</a>
+        <a href="#como-appsheet-ajuda">Como o AppSheet resolve</a>
+        <a href="#automacoes">Automatizações</a>
+        <a href="#comparativo">Tabela comparativa</a>
+        <a href="#fluxo-proposto">Fluxo proposto</a>
+        <a href="#proximos-passos">Próximos passos</a>
+        <a href="#faq">FAQ</a>
+      </div>
+    </nav>
+
+    <section id="iniciativa">
+      <h2>Iniciativa</h2>
+      <div class="grid cols-2">
+        <div class="card">
+          <h3>Contexto</h3>
+          <p>Hoje utilizamos o <strong>ClickUp</strong> para solicitar melhorias de processos de atendimento. Estamos sugerindo que as solicitações passem a ser recebidas pelo <strong>AppSheet</strong>, que oferece mais opções de automação, personalização e acompanhamento ponta‑a‑ponta.</p>
+          <p><strong>Objetivo:</strong> reduzir esforço manual, aumentar visibilidade e rastreabilidade do status, além de acelerar o ciclo de melhoria com notificações e relatórios automatizados.</p>
+        </div>
+       
+      </div>
+    </section>
+
+    <section id="dor-clickup">
+      <h2>Pain Points do ClickUp</h2>
+      <div class="grid cols-2">
+        <div class="card">
+          <h3>⛔Limitações do formulário:</h3>
+          <ul class="list">
+            <li class="x">Não permite automação do formulário.</li>
+            <li class="x">Não permite adicionar comentários na solicitação.</li>
+            <li class="x">Não permite acompanhamento em tempo real da solicitação.</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>Visibilidade & comunicação</h3>
+          <ul class="list">
+            <li class="x">Não permite <strong>report semanal</strong> aos stakeholders.</li>
+            <li class="x">Não possui integração com <strong>SeaTalk</strong>/e‑mail para notificar os usuários.</li>
+            <li class="x">Baixo controle de personalização e visualização de tickets.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section id="como-appsheet-ajuda">
+      <h2>Como o AppSheet resolve</h2>
+      <div class="grid cols-3">
+        <div class="card">
+          <div class="kpi">
+            <div class="icon">⚙️</div>
+            <div>
+              <strong>Formulários dinâmicos</strong>
+              <div class="muted">Validações e pré‑preenchimentos</div>
+            </div>
+          </div>
+          <ul class="list">
+            <li>Preenchimento automático de campos do formulário, com base nos dados do usuário logado.</li>
+            <li>Cálculo automático de prazo e prioridade</li>
+          </ul>
+        </div>
+
+        <div class="card">
+          <div class="kpi">
+            <div class="icon">📣</div>
+            <div>
+              <strong>Notificações integradas</strong>
+              <div class="muted">SeaTalk & E‑mail</div>
+            </div>
+          </div>
+          <ul class="list">
+            <li>Mensagem automática quando o <strong>Status</strong> muda (ex.: “Concluído”, “Pendente de informação”).</li>
+            <li>Integração com Seatalk e e-mail para notificar usuários</li>
+          </ul>
+        </div>
+
+        <div class="card">
+          <div class="kpi">
+            <div class="icon">📊</div>
+            <div>
+              <strong>Relatórios & dashboards</strong>
+              <div class="muted">Semanal, mensal e sob demanda</div>
+            </div>
+          </div>
+          <ul class="list">
+            <li><strong>Criação de Dashboards dinâmicos</strong>: relatórios personalizados para acompanhamento.</li>
+            <li><strong>Agendamento de report (semanais/mensais)</strong> para stakeholders via automação.</li>
+          </ul>
+        </div>
+
+        <div class="card">
+          <div class="kpi">
+            <div class="icon">🧭</div>
+            <div>
+              <strong>Acompanhamento ponta‑a‑ponta</strong>
+              <div class="muted">Visões por usuário e governança</div>
+            </div>
+          </div>
+          <ul class="list">
+            <li><strong>Controle total de visualizações</strong>: cada usuário visualiza apenas suas próprias solicitações.</li>
+            <li><strong>Automações</strong> que preenchem as informações automáticamente <em>(ex. E-mail, Empresa, Reason Code, Data de conclusão </em>)</li>
+            <li>Campos de comentário para BPO/Interno.</li>
+          </ul>
+        </div>
+
+        <div class="card">
+          <div class="kpi">
+            <div class="icon">🔐</div>
+            <div>
+              <strong>Segurança & auditoria</strong>
+              <div class="muted">Registros e permissões</div>
+            </div>
+          </div>
+          <ul class="list">
+            <li><strong>Controle e restrição de visualizações </strong>: personalização de quais colunas e linhas cada usuário pode ter acesso</li>
+            <li>Log de exclusões/ações via automações em Sheets.</li>
+            <li>Os registros e ações dentro do app, assim como as automações e usabilidade, podem ser monitorados no AppSheet</li>
+
+        </ul>
+        </div>
+
+        <div class="card">
+          <div class="kpi">
+            <div class="icon">🧩</div>
+            <div>
+              <strong>Personalização rápida</strong>
+              <div class="muted">Alto nível de personalização e controle</div>
+            </div>
+          </div>
+          <ul class="list">
+            <li>Layouts em <strong>cards</strong>, tabelas e detalhes com painel lateral.</li>
+            <li>Controle e personalização total, sob demanda</li>
+            <li>Visualização minimalista e fácil usabilidade</li>
+
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section id="automacoes">
+      <h2>Automatizações já implementadas</h2>
+      <div class="grid cols-2">
+        <div class="card">
+          <h3>Eventos & Ações</h3>
+          <ul class="list">
+            <li>Notificar SeaTalk ao mudar para <strong>Concluído</strong> e para <strong>Pendente de informação</strong>.</li>
+            <li>Atualizar <strong>Data de Entrega</strong> quando o botão “Concluir” é clicado.</li>
+            <li>Exibir/ocultar botões por e‑mail/domínio e por <strong>Status</strong>.</li>
+            <li>Registro de cliques em <em>cards</em> interativos.</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>Mensageria</h3>
+          <ul class="list">
+            <li>Envio de <strong>DM</strong> e mensagens em <strong>grupo</strong> no SeaTalk (com <em>fallback</em> se usuário não logado).</li>
+            <li>Atualização de <em>cards</em> e envio de “Obrigado por responder”.</li>
+            <li>Templates de e‑mail HTML com logo/imagens.</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>Dados & Formulário</h3>
+          <ul class="list">
+            <li>RC L1/L2/L3 por tabela <em>Ref</em> (listas <em>Enum</em> dinâmicas).</li>
+            <li>Nome a partir do e‑mail; Empresa por <em>lookup</em>; nomes em MAIÚSCULO/Title Case.</li>
+            <li>Cálculo de <strong>Prazo</strong> por prioridade × esforço; “Entrega” (Ontime/Delayed).</li>
+            <li>Mês e Semana do <strong>Timestamp</strong> para filtros e KPIs.</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>Relatórios</h3>
+          <ul class="list">
+            <li><strong>Construtor de Relatórios</strong> (seleção de colunas + período) com envio via SeaTalk/e‑mail.</li>
+            <li>Agendamento de <strong>report semanal</strong> e <strong>mensal</strong> para stakeholders.</li>
+            <li>Dash de “Minhas Solicitações” e gráficos por RC L3.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section id="comparativo">
+      <h2>Tabela comparativa</h2>
+      <table class="compare">
+        <thead>
+          <tr>
+            <th>Capacidade</th>
+            <th>ClickUp (atual)</th>
+            <th>AppSheet (proposto)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Automação do formulário</td>
+            <td><span class="x">Indisponível</span></td>
+            <td><span class="check">Regras condicionais, pré‑preenchimento e refs</span></td>
+          </tr>
+          <tr>
+            <td>Preenchimento automático de RC</td>
+            <td><span class="x">Indisponível</span></td>
+            <td><span class="check">Listas RC L1/L2/L3 por tabela de referência</span></td>
+          </tr>
+          <tr>
+            <td>Integração SeaTalk/e‑mail</td>
+            <td><span class="x">Indisponível</span></td>
+            <td><span class="check">DM/Grupo, cards interativos e e‑mails HTML</span></td>
+          </tr>
+          <tr>
+            <td>Report semanal/mensal</td>
+            <td><span class="x">Indisponível</span></td>
+            <td><span class="check">Agendado + sob demanda (Construtor)</span></td>
+          </tr>
+          <tr>
+            <td>Acompanhamento das solicitações</td>
+            <td><span class="x">Limitado</span></td>
+            <td><span class="check">Dashboards, filtros por usuário e status</span></td>
+          </tr>
+          <tr>
+            <td>Comentários BPO/Interno</td>
+            <td><span class="x">Indisponível</span></td>
+            <td><span class="check">Campos dedicados + notificações</span></td>
+          </tr>
+          <tr>
+            <td>Governança e auditoria</td>
+            <td><span class="x">Limitado</span></td>
+            <td><span class="check">Logs em Sheets + Security Filters</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section id="fluxo-proposto">
+      <h2>Fluxo proposto (alto nível)</h2>
+      <div class="timeline">
+        <div class="timeline-step">
+          <h3>1) Submissão</h3>
+          <p>Usuário escolhe <strong>Tipo de usuário</strong> (3 cards) → formulário dinâmico com RCs e validações.</p>
+        </div>
+        <div class="timeline-step">
+          <h3>2) Enfileiramento & SLA</h3>
+          <p>Registro no Google Sheets com cálculo de <strong>Prazo</strong> (P×E), <strong>Semana</strong> e <strong>Mês</strong>.</p>
+        </div>
+        <div class="timeline-step">
+          <h3>3) Notificações</h3>
+          <p>SeaTalk (DM/Grupo) + e‑mail HTML em eventos de <em>Status</em> e atribuição; registro de cliques nos cards.</p>
+        </div>
+        <div class="timeline-step">
+          <h3>4) Acompanhamento</h3>
+          <p>Dashboards por RC L3, vistas por usuário, botões condicionais (ex.: concluir → atualiza Data de Entrega).</p>
+        </div>
+        <div class="timeline-step">
+          <h3>5) Medição & Report</h3>
+          <p>Relatórios semanais/mensais automáticos + <strong>Construtor</strong> sob demanda (colunas & período).</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="proximos-passos">
+      <h2>Próximos passos</h2>
+      <ol class="list">
+        <li><strong>Validar</strong> escopo de campos RC e dependências (L1/L2/L3) + regras de exibição.</li>
+        <li><strong>Migrar</strong> formulário para AppSheet com pré‑preenchimentos e validações.</li>
+        <li><strong>Conectar</strong> automações de SeaTalk/e‑mail (DM, Grupo, cards, fallback).</li>
+        <li><strong>Publicar</strong> dashboards e vistas de acompanhamento (por usuário e por status).</li>
+        <li><strong>Agendar</strong> report semanal/mensal e ativar o Construtor de Relatórios.</li>
+        <li><strong>Piloto</strong> com grupo reduzido (BPO + Interno) e ajustes finais.</li>
+      </ol>
+      <div class="footer">
+        <span>© Central de Melhoria • AppSheet • Versão 1.1 — tema Shopee</span>
+        <div class="cta"><a class="btn secondary" href="#iniciativa">Voltar ao topo</a><button class="btn" onclick="window.print()">Exportar PDF</button></div>
+      </div>
+    </section>
+
+    <section>
+      <h2>Shopito — galeria</h2>
+      <div class="gallery">
+        <img alt="Shopito apresentação" src="https://mir-s3-cdn-cf.behance.net/project_modules/fs_webp/0821a3150187617.6765baea27b17.png" />
+        <img alt="Shopito animação 1" src="https://mir-s3-cdn-cf.behance.net/project_modules/source/5c671b150187617.62f5244e4ecc5.gif" />
+        <img alt="Shopito animação 2" src="https://mir-s3-cdn-cf.behance.net/project_modules/source/c3a118150187617.62f5244e4e7f8.gif" />
+      </div>
+    </section>
+
+    <section id="faq">
+      <h2>FAQ rápido</h2>
+      <div class="grid cols-2">
+        <div class="card">
+          <h3>Precisamos de TI para manter?</h3>
+          <p>Para evoluções simples de layout, campos e regras, não. As integrações já estão empacotadas via Apps Script e podem ser reaproveitadas.</p>
+        </div>
+        <div class="card">
+          <h3>Como ficam dados históricos?</h3>
+          <p>Os dados residem em Google Sheets, facilitando migração/backup. Podemos importar o histórico do ClickUp para manter continuidade.</p>
+        </div>
+        <div class="card">
+          <h3>E se o destinatário não tiver SeaTalk?</h3>
+          <p>O fluxo contempla <em>fallback</em> por e‑mail HTML, garantindo que nenhuma notificação se perca.</p>
+        </div>
+        <div class="card">
+          <h3>Conseguimos medir desempenho?</h3>
+          <p>Sim. Prazo (P×E), Entrega (Ontime/Delayed), contagem por RC e filtros por período já estão prontos para dashboard e reports.</p>
+        </div>
+      </div>
+    </section>
+  </div>
+</body>
+</html>
